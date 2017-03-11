@@ -1,4 +1,4 @@
-package edu.cornell.tech.foundry.ohmclient;
+package edu.cornell.tech.foundry.omhclient;
 
 import android.util.Base64;
 import android.util.Log;
@@ -11,14 +11,14 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientBadGateway;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientDataPointConflict;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientInvalidAccessToken;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientInvalidRefreshToken;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientMalformedResponse;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientOtherException;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientServerException;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientUnreachable;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientBadGateway;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientDataPointConflict;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientInvalidAccessToken;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientInvalidRefreshToken;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientMalformedResponse;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientOtherException;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientServerException;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientUnreachable;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;

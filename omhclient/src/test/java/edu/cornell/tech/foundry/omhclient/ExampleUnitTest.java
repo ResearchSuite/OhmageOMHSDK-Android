@@ -1,4 +1,4 @@
-package edu.cornell.tech.foundry.ohmclient;
+package edu.cornell.tech.foundry.omhclient;
 
 import org.junit.Test;
 

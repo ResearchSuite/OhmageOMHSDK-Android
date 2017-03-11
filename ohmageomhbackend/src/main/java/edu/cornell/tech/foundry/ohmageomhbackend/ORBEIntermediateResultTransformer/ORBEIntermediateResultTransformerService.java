@@ -8,7 +8,7 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
 import edu.cornell.tech.foundry.ohmageomhbackend.ORBEIntermediateResultTransformer.spi.ORBEIntermediateResultTransformer;
-import edu.cornell.tech.foundry.ohmclient.OMHDataPoint;
+import edu.cornell.tech.foundry.omhclient.OMHDataPoint;
 import edu.cornell.tech.foundry.researchsuiteresultprocessor.RSRPFrontEndServiceProvider.spi.RSRPFrontEnd;
 import edu.cornell.tech.foundry.researchsuiteresultprocessor.RSRPIntermediateResult;
 

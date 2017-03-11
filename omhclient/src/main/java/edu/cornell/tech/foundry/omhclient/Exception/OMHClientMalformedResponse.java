@@ -1,4 +1,4 @@
-package edu.cornell.tech.foundry.ohmclient.Exception;
+package edu.cornell.tech.foundry.omhclient.Exception;
 
 import org.json.JSONObject;
 

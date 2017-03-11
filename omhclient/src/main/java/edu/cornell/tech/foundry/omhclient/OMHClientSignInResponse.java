@@ -1,4 +1,4 @@
-package edu.cornell.tech.foundry.ohmclient;
+package edu.cornell.tech.foundry.omhclient;
 
 /**
  * Created by jameskizer on 2/4/17.

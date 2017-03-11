@@ -9,10 +9,10 @@ import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHAlreadySignedIn
 import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHException;
 import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHInvalidSample;
 import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHNotSignedIn;
-import edu.cornell.tech.foundry.ohmclient.Exception.OMHClientInvalidAccessToken;
-import edu.cornell.tech.foundry.ohmclient.OMHClient;
-import edu.cornell.tech.foundry.ohmclient.OMHClientSignInResponse;
-import edu.cornell.tech.foundry.ohmclient.OMHDataPoint;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientInvalidAccessToken;
+import edu.cornell.tech.foundry.omhclient.OMHClient;
+import edu.cornell.tech.foundry.omhclient.OMHClientSignInResponse;
+import edu.cornell.tech.foundry.omhclient.OMHDataPoint;
 
 public class OhmageOMHManager {
 

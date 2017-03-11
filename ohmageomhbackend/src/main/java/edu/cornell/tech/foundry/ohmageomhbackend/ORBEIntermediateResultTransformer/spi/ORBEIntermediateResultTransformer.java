@@ -2,7 +2,7 @@ package edu.cornell.tech.foundry.ohmageomhbackend.ORBEIntermediateResultTransfor
 
 import android.content.Context;
 
-import edu.cornell.tech.foundry.ohmclient.OMHDataPoint;
+import edu.cornell.tech.foundry.omhclient.OMHDataPoint;
 import edu.cornell.tech.foundry.researchsuiteresultprocessor.RSRPIntermediateResult;
 
 /**
