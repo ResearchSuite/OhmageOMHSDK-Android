@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-version = '0.0.2'
+version = '0.0.3'
 
 android {
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 24
         versionCode 1
         versionName version
@@ -26,11 +26,11 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'edu.cornell.tech.foundry:omhclient:0.0.1'
+    compile 'edu.cornell.tech.foundry:omhclient:0.0.2'
 //    compile project(":omhclient")
-    compile 'edu.cornell.tech.foundry:ohmageomhsdk:0.0.2'
+    compile 'edu.cornell.tech.foundry:ohmageomhsdk:0.0.3'
 //    compile project(":ohmageomhsdk")
-    compile 'edu.cornell.tech.foundry:researchsuiteresultsprocessor:0.0.1'
+    compile 'edu.cornell.tech.foundry:researchsuiteresultsprocessor:0.0.2'
 
 }
 
