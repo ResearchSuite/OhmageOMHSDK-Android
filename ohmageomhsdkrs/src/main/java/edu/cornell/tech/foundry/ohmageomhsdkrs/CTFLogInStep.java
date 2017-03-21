@@ -18,6 +18,14 @@ public class CTFLogInStep extends Step {
         return forgotPasswordButtonTitle;
     }
 
+    public String getIdentityFieldName() {
+        return identityFieldName;
+    }
+
+    public String getPasswordFieldName() {
+        return passwordFieldName;
+    }
+
     private String logInButtonTitle = "Log In";
 
     public void setLogInButtonTitle(String logInButtonTitle) {
@@ -28,7 +36,17 @@ public class CTFLogInStep extends Step {
         this.forgotPasswordButtonTitle = forgotPasswordButtonTitle;
     }
 
+    public void setIdentityFieldName(String identityFieldName) {
+        this.identityFieldName = identityFieldName;
+    }
+
+    public void setPasswordFieldName(String passwordFieldName) {
+        this.passwordFieldName = passwordFieldName;
+    }
+
     private String forgotPasswordButtonTitle;
+    private String identityFieldName = "Username";
+    private String passwordFieldName = "Password";
 
     public CTFLogInStep(String identifier, String title, String text, Class logInLayoutClass) {
         super(identifier, title);

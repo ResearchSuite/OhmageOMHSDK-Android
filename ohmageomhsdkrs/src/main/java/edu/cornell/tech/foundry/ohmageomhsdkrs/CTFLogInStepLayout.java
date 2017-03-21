@@ -81,9 +81,21 @@ public class CTFLogInStepLayout extends RelativeLayout implements StepLayout {
         this.step = (CTFLogInStep) step;
         this.result = result == null ? new StepResult<>(step) : result;
 
-        View layout = LayoutInflater.from(getContext()).inflate(R.layout.rss_layout_sign_in, this, true);
+        View layout = LayoutInflater.from(getContext()).inflate(R.layout.ctf_layout_sign_in, this, true);
+
+        //set title and text
+        TextView titleView = (TextView) layout.findViewById(R.id.title);
+        titleView.setText(this.step.getTitle());
+        if(this.step.getText() != null) {
+            TextView textView = (TextView) layout.findViewById(R.id.text);
+            textView.setText(this.step.getText());
+            textView.setVisibility(VISIBLE);
+        }
 
         progress = layout.findViewById(R.id.progress);
+
+        TextView identityLabel = (TextView) layout.findViewById(R.id.identityLabel);
+        identityLabel.setText(this.step.getIdentityFieldName());
 
         identityField = (AppCompatEditText) layout.findViewById(R.id.username);
         identityField.addTextChangedListener(new TextWatcherAdapter()
@@ -97,7 +109,7 @@ public class CTFLogInStepLayout extends RelativeLayout implements StepLayout {
                 }
             }
         });
-        identityField.setHint("Enter username");
+        identityField.setHint(this.step.getIdentityFieldName());
 
         passwordField = (AppCompatEditText) layout.findViewById(R.id.password);
         passwordField.addTextChangedListener(new TextWatcherAdapter()
@@ -115,12 +127,15 @@ public class CTFLogInStepLayout extends RelativeLayout implements StepLayout {
             if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) ||
                     (actionId == EditorInfo.IME_ACTION_DONE))
             {
-                //TODO: add sign in
-//                signIn();
                 return true;
             }
             return false;
         });
+
+        passwordField.setHint(this.step.getPasswordFieldName());
+
+        TextView passwordLabel = (TextView) layout.findViewById(R.id.passwordLabel);
+        passwordLabel.setText(this.step.getPasswordFieldName());
 
         forgotPassword = (TextView) layout.findViewById(R.id.forgot_password);
         if (this.step.getForgotPasswordButtonTitle() != null && !this.step.getForgotPasswordButtonTitle().isEmpty()) {
