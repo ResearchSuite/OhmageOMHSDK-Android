@@ -42,8 +42,8 @@ public class CTFLogInStepLayout extends RelativeLayout implements StepLayout {
 
 
     private View               progress;
-    private AppCompatEditText identityField;
-    private AppCompatEditText  passwordField;
+    protected AppCompatEditText identityField;
+    protected AppCompatEditText  passwordField;
     private TextView forgotPassword;
     private CTFLogInStep         step;
     private StepResult<Boolean> result;

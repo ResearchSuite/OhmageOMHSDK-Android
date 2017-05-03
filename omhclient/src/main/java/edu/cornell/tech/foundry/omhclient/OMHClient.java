@@ -200,9 +200,27 @@ public class OMHClient {
 
     }
 
+    public void postSample(String sampleString, String accessToken, final PostSampleCompletion completion) {
+
+        this.postStringSample(sampleString, accessToken, completion);
+
+    }
+
     private void postJSONSample(JSONObject sampleJson, String accessToken, final PostSampleCompletion completion) {
 
         String jsonString = sampleJson.toString();
+        RequestBody body = RequestBody.create(JSON, jsonString);
+        Request request = new Request.Builder()
+                .url(this.baseURL + "/dataPoints")
+                .header("Authorization", "Bearer " + accessToken)
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(this.processJSONResponse(completion));
+    }
+
+    private void postStringSample(String jsonString, String accessToken, final PostSampleCompletion completion) {
+
         RequestBody body = RequestBody.create(JSON, jsonString);
         Request request = new Request.Builder()
                 .url(this.baseURL + "/dataPoints")

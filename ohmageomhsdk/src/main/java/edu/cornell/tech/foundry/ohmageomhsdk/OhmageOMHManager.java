@@ -2,21 +2,30 @@ package edu.cornell.tech.foundry.ohmageomhsdk;
 
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.squareup.tape.FileObjectQueue;
+import com.squareup.tape.ObjectQueue;
+
+import java.io.File;
+import java.io.IOException;
 
 import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHAlreadySignedIn;
 import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHException;
 import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHInvalidSample;
 import edu.cornell.tech.foundry.ohmageomhsdk.Exceptions.OhmageOMHNotSignedIn;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientDataPointConflict;
 import edu.cornell.tech.foundry.omhclient.Exception.OMHClientInvalidAccessToken;
+import edu.cornell.tech.foundry.omhclient.Exception.OMHClientInvalidDataPoint;
 import edu.cornell.tech.foundry.omhclient.OMHClient;
 import edu.cornell.tech.foundry.omhclient.OMHClientSignInResponse;
 import edu.cornell.tech.foundry.omhclient.OMHDataPoint;
 
-public class OhmageOMHManager {
+public class OhmageOMHManager implements ObjectQueue.Listener<String> {
 
-    final static String TAG = OMHClient.class.getSimpleName();
+    final static String TAG = OhmageOMHManager.class.getSimpleName();
 
     private static String ACCESS_TOKEN = "AccessToken";
     private static String REFRESH_TOKEN = "RefreshToken";
@@ -33,6 +42,10 @@ public class OhmageOMHManager {
 
     private OMHClient client;
 
+    private Object uploadLock;
+    FileObjectQueue<String> ohmageOMHDatapointQueue;
+    boolean isUploading = false;
+
     @Nullable
     public static OhmageOMHManager getInstance() {
         synchronized (managerLock) {
@@ -40,10 +53,10 @@ public class OhmageOMHManager {
         }
     }
 
-    public static void config(Context context, String baseURL, String clientID, String clientSecret, OhmageOMHSDKCredentialStore store) {
+    public static void config(Context context, String baseURL, String clientID, String clientSecret, OhmageOMHSDKCredentialStore store, String queueStorageDirectory) {
         synchronized (managerLock) {
             if (manager == null) {
-                manager = new OhmageOMHManager(context, baseURL, clientID, clientSecret, store);
+                manager = new OhmageOMHManager(context, baseURL, clientID, clientSecret, store, queueStorageDirectory);
             }
         }
     }
@@ -74,7 +87,7 @@ public class OhmageOMHManager {
         return null;
     }
 
-    private OhmageOMHManager(Context context, String baseURL, String clientID, String clientSecret, OhmageOMHSDKCredentialStore store) {
+    private OhmageOMHManager(Context context, String baseURL, String clientID, String clientSecret, OhmageOMHSDKCredentialStore store, String queueStorageDirectory) {
 
         this.context = context;
         this.client = new OMHClient(baseURL, clientID, clientSecret);
@@ -92,6 +105,23 @@ public class OhmageOMHManager {
         if(savedRefreshToken != null) {
             this.refreshToken = savedRefreshToken;
         }
+
+        //load queue from disk
+        this.uploadLock = new Object();
+
+        File queueFile = new File(context.getFilesDir() + queueStorageDirectory);
+        OhmageOMHDatapointConverter converter = new OhmageOMHDatapointConverter();
+        try {
+            this.ohmageOMHDatapointQueue = new FileObjectQueue<>(queueFile, converter);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        //this calls onAdd for each element on queue
+        this.ohmageOMHDatapointQueue.setListener(this);
+
+        //try to upload any existing datapoints
+        this.upload();
 
     }
 
@@ -114,6 +144,11 @@ public class OhmageOMHManager {
     }
 
     private void clearCredentials() {
+
+        //clear queue as well
+        while(this.ohmageOMHDatapointQueue.size() > 0) {
+            this.ohmageOMHDatapointQueue.remove();
+        }
         synchronized (this.credentialsLock) {
             this.accessToken = null;
             this.credentialStore.remove(context, ACCESS_TOKEN);
@@ -121,8 +156,9 @@ public class OhmageOMHManager {
             this.refreshToken = null;
             this.credentialStore.remove(context, REFRESH_TOKEN);
         }
-    }
 
+
+    }
 
 
 //    public static synchronized OhmageOMHManager getInstance() {
@@ -157,6 +193,130 @@ public class OhmageOMHManager {
         });
     }
 
+    private void refresh(final Completion completion) {
+        String localRefreshToken;
+        synchronized (credentialsLock) {
+            localRefreshToken = refreshToken;
+        }
+
+        client.refreshAccessToken(localRefreshToken, new OMHClient.AuthCompletion() {
+            @Override
+            public void onCompletion(OMHClientSignInResponse response, Exception e) {
+                if (response != null && e == null) {
+                    setCredentials(response.getAccessToken(), response.getRefreshToken());
+                    completion.onCompletion(null);
+                }
+                else {
+                    clearCredentials();
+                    completion.onCompletion(new OhmageOMHNotSignedIn());
+                }
+            }
+        });
+    }
+
+    private void tryToUpload() {
+
+        assert(this.isSignedIn());
+
+        synchronized (this.uploadLock) {
+
+            if (this.isUploading) {
+                return;
+            }
+
+            if (this.ohmageOMHDatapointQueue.size() < 1) {
+                return;
+            }
+
+            this.isUploading = true;
+
+            String datapointString = this.ohmageOMHDatapointQueue.peek();
+
+            assert(datapointString != null && !datapointString.isEmpty());
+
+            String localAccessToken;
+            synchronized (this.credentialsLock) {
+                localAccessToken = this.accessToken;
+            }
+
+            assert(localAccessToken != null && !localAccessToken.isEmpty());
+
+            this.client.postSample(datapointString, localAccessToken, new OMHClient.PostSampleCompletion() {
+                @Override
+                public void onCompletion(boolean success, Exception e) {
+
+//                    OhmageOMHManager.this.isUploading = false;
+
+                    if (success) {
+                        Log.w(TAG, "Datapoint successfully uploaded");
+                        OhmageOMHManager.this.ohmageOMHDatapointQueue.remove();
+
+                        OhmageOMHManager.this.isUploading = false;
+                        OhmageOMHManager.this.upload();
+                        return;
+                    }
+
+                    if (e instanceof OMHClientInvalidAccessToken) {
+
+                        Log.w(TAG, "Refreshing token");
+                        refresh(new Completion() {
+                            @Override
+                            public void onCompletion(Exception e) {
+                                if (e == null) {
+                                    OhmageOMHManager.this.isUploading = false;
+                                    OhmageOMHManager.this.upload();
+                                }
+                                else {
+                                    OhmageOMHManager.this.clearCredentials();
+                                    OhmageOMHManager.this.isUploading = false;
+                                }
+                            }
+                        });
+                        return;
+
+                    }
+                    else if (e instanceof OMHClientDataPointConflict){
+
+                        OhmageOMHManager.this.ohmageOMHDatapointQueue.remove();
+                        OhmageOMHManager.this.isUploading = false;
+                        OhmageOMHManager.this.upload();
+                        return;
+                    }
+
+
+                    else {
+                        OhmageOMHManager.this.isUploading = false;
+                        return;
+                    }
+
+                }
+            });
+
+        }
+    }
+
+    private void upload() {
+
+
+
+        //start async task here
+
+        class UploadTask extends AsyncTask<Void, Void, Void> {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                OhmageOMHManager.this.tryToUpload();
+
+                return null;
+
+            }
+        }
+
+        new UploadTask().execute();
+
+    }
+
     public void addDatapoint(final OMHDataPoint datapoint, final Completion completion) {
 
         if (!this.isSignedIn()) {
@@ -171,35 +331,10 @@ public class OhmageOMHManager {
             return;
         }
 
-        String localAccessToken;
-        synchronized (this.credentialsLock) {
-            localAccessToken = this.accessToken;
-        }
-
-        this.client.postSample(datapoint.toJson(), localAccessToken, new OMHClient.PostSampleCompletion() {
-            @Override
-            public void onCompletion(boolean success, Exception e) {
-
-                if (success) {
-                    Log.w(TAG, "Datapoint successfully uploaded");
-                    completion.onCompletion(null);
-                    return;
-                }
-
-                if (e instanceof OMHClientInvalidAccessToken) {
-
-                    Log.w(TAG, "Refreshing token");
-                    refreshThenAdd(datapoint, completion);
-                    return;
-
-                }
-                else {
-                    completion.onCompletion(e);
-                    return;
-                }
-
-            }
-        });
+        //add datapoint
+        //this should notify the listener, which should start the upload
+        String datapointString = datapoint.toJson().toString();
+        this.ohmageOMHDatapointQueue.add(datapointString);
 
     }
 
@@ -233,6 +368,18 @@ public class OhmageOMHManager {
 
         clearCredentials();
         completion.onCompletion(null);
+    }
+
+
+    //Queue Listener Methods
+    @Override
+    public void onAdd(ObjectQueue<String> queue, String entry) {
+        this.upload();
+    }
+
+    @Override
+    public void onRemove(ObjectQueue<String> queue) {
+
     }
 
 }

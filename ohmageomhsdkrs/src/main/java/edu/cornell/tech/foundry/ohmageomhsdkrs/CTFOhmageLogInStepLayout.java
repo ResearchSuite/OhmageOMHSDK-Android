@@ -2,8 +2,12 @@ package edu.cornell.tech.foundry.ohmageomhsdkrs;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.widget.Toast;
+
+import org.researchstack.backbone.result.StepResult;
+import org.researchstack.backbone.step.Step;
 
 import edu.cornell.tech.foundry.ohmageomhsdk.OhmageOMHManager;
 
@@ -23,6 +27,13 @@ public class CTFOhmageLogInStepLayout extends CTFLogInStepLayout {
 
     public CTFOhmageLogInStepLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }
+
+    @Override
+    public void initialize(Step step, StepResult result) {
+        super.initialize(step, result);
+        this.passwordField.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_PASSWORD);
     }
 
     @Override
