@@ -3,7 +3,7 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-version = '0.0.5'
+version = '0.0.6'
 
 android {
     compileSdkVersion 24
@@ -38,10 +38,11 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.1.1'
     testCompile 'junit:junit:4.12'
-//    compile project(":ohmageomhsdk")
-    compile 'edu.cornell.tech.foundry:ohmageomhsdk:0.0.4'
-    compile 'org.researchstack:backbone:1.1.1'
-    compile 'org.researchstack:skin:1.1.1'
+    compile project(":ohmageomhsdk")
+//    compile 'edu.cornell.tech.foundry:ohmageomhsdk:0.0.4'
+    compile 'org.researchstack:backbone:1.1.2'
+    compile 'org.researchstack:skin:1.1.2'
+    compile 'org.researchsuite:rsuiteextensionscore:0.0.1'
 }
 
 ext {

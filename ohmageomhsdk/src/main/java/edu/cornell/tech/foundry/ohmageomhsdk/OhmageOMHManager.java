@@ -2,6 +2,7 @@ package edu.cornell.tech.foundry.ohmageomhsdk;
 
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -63,28 +64,32 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
 
     @Nullable
     private String getAccessToken() {
-        byte[] accessTokenData = this.credentialStore.get(context, ACCESS_TOKEN);
-        if (accessTokenData != null) {
-            String accessToken = new String(accessTokenData);
-            if (accessToken != null  && !accessToken.isEmpty()) {
-                return accessToken;
+        //if local accessToken is null, try to load
+        if (this.accessToken == null) {
+            byte[] accessTokenData = this.credentialStore.get(context, ACCESS_TOKEN);
+            if (accessTokenData != null) {
+                String accessToken = new String(accessTokenData);
+                if (accessToken != null  && !accessToken.isEmpty()) {
+                    this.accessToken = accessToken;
+                }
             }
         }
-
-        return null;
+        return this.accessToken;
     }
 
     @Nullable
     private String getRefreshToken() {
-        byte[] refreshTokenData = this.credentialStore.get(context, REFRESH_TOKEN);
-        if (refreshTokenData != null) {
-            String refreshToken = new String(refreshTokenData);
-            if (refreshToken != null  && !refreshToken.isEmpty()) {
-                return refreshToken;
+        //if local refreshToken is null, try to load
+        if (this.refreshToken == null) {
+            byte[] refreshTokenData = this.credentialStore.get(context, REFRESH_TOKEN);
+            if (refreshTokenData != null) {
+                String refreshToken = new String(refreshTokenData);
+                if (refreshToken != null  && !refreshToken.isEmpty()) {
+                    this.refreshToken = refreshToken;
+                }
             }
         }
-
-        return null;
+        return this.refreshToken;
     }
 
     private OhmageOMHManager(Context context, String baseURL, String clientID, String clientSecret, OhmageOMHSDKCredentialStore store, String queueStorageDirectory) {
@@ -96,15 +101,17 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
 
         this.credentialStore = store;
 
-        String savedAccessToken = this.getAccessToken();
-        if(savedAccessToken != null) {
-            this.accessToken = savedAccessToken;
-        }
+        this.getAccessToken();
+//        String savedAccessToken = this.getAccessToken();
+//        if(savedAccessToken != null) {
+//            this.accessToken = savedAccessToken;
+//        }
 
-        String savedRefreshToken = this.getRefreshToken();
-        if(savedRefreshToken != null) {
-            this.refreshToken = savedRefreshToken;
-        }
+        this.getRefreshToken();
+//        String savedRefreshToken = this.getRefreshToken();
+//        if(savedRefreshToken != null) {
+//            this.refreshToken = savedRefreshToken;
+//        }
 
         //load queue from disk
         this.uploadLock = new Object();
@@ -129,6 +136,10 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
         synchronized (this.credentialsLock) {
             return this.refreshToken != null && !this.refreshToken.isEmpty();
         }
+    }
+
+    public Uri getAuthURI() {
+        return this.client.getAuthURI();
     }
 
     private void setCredentials(String accessToken, String refreshToken) {
@@ -346,6 +357,32 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
         }
 
         this.client.signIn(username, password, new OMHClient.AuthCompletion() {
+            @Override
+            public void onCompletion(OMHClientSignInResponse response, Exception e) {
+                if (e != null) {
+                    completion.onCompletion(e);
+                    return;
+                }
+
+                if (response != null) {
+                    setCredentials(response.getAccessToken(), response.getRefreshToken());
+                }
+
+                completion.onCompletion(null);
+                return;
+            }
+        });
+
+    }
+
+    public void signIn(String code, final Completion completion) {
+
+        if (this.isSignedIn()) {
+            completion.onCompletion(new OhmageOMHAlreadySignedIn());
+            return;
+        }
+
+        this.client.signIn(code, new OMHClient.AuthCompletion() {
             @Override
             public void onCompletion(OMHClientSignInResponse response, Exception e) {
                 if (e != null) {

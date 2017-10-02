@@ -1,5 +1,6 @@
 package edu.cornell.tech.foundry.omhclient;
 
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 
@@ -61,6 +62,14 @@ public class OMHClient {
         this.clientSecret = clientSecret;
     }
 
+    public Uri getAuthURI() {
+        StringBuilder sb = new StringBuilder(this.baseURL);
+        sb.append("/oauth/authorize?client_id=");
+        sb.append(this.clientID);
+        sb.append("&response_type=code");
+        return Uri.parse(sb.toString());
+    }
+
     public void signIn(String username, String password, final AuthCompletion completion) {
 
         RequestBody body = new FormBody.Builder()
@@ -77,6 +86,23 @@ public class OMHClient {
 
         client.newCall(request).enqueue(this.processAuthResponse(completion));
     }
+
+    public void signIn(String code, final AuthCompletion completion) {
+
+        RequestBody body = new FormBody.Builder()
+                .add("code", code)
+                .add("grant_type", "authorization_code")
+                .build();
+
+        Request request = new Request.Builder()
+                .header("Authorization", "Basic " + this.getBasicAuthString(this.clientID, this.clientSecret))
+                .url(this.baseURL + "/oauth/token")
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(this.processAuthResponse(completion));
+    }
+
 
     public void refreshAccessToken(String refreshToken, final AuthCompletion completion) {
         RequestBody body = new FormBody.Builder()
@@ -184,7 +210,7 @@ public class OMHClient {
     public boolean validateSampleJson(JSONObject sampleJson) {
         try {
             String sampleJsonString = sampleJson.toString();
-            Log.e(TAG, "validating json" + sampleJsonString);
+            Log.i(TAG, "validating json" + sampleJsonString);
             JSONObject recodedJson = new JSONObject(sampleJsonString);
             return true;
         } catch (JSONException ex) {

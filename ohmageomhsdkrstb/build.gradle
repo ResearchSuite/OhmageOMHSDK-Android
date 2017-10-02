@@ -1,18 +1,22 @@
 apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-version = '0.0.6'
+version = '0.0.1'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 24
+        targetSdkVersion 26
         versionCode 1
         versionName version
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -20,29 +24,36 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:26.+'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.1.1'
-//    compile 'edu.cornell.tech.foundry:omhclient:0.0.4'
-    compile project(":omhclient")
-//    compile 'edu.cornell.tech.foundry:ohmageomhsdk:0.0.4'
-    compile project(":ohmageomhsdk")
-    compile 'edu.cornell.tech.foundry:researchsuiteresultsprocessor:0.0.5'
 
+    compile project(":ohmageomhsdkrs")
+    compile 'org.researchsuite:rsuiteextensionscore:0.0.1'
+    compile 'edu.cornell.tech.foundry:researchsuitetaskbuilder:0.0.5'
+    compile 'org.researchsuite:rsuiteextensionsrstb:0.0.1'
 }
 
 ext {
     bintrayRepo = 'ResearchSuiteAppFramework'
-    bintrayName = 'ohmageomhbackend'
+    bintrayName = 'ohmageomhsdkrstb'
 
     publishedGroupId = 'edu.cornell.tech.foundry'
     libraryName = bintrayName
     artifact = bintrayName
 
-    libraryDescription = 'OhmageOMHBackend provides support for the ResearchSuiteResultsProcessor'
+    libraryDescription = 'OhmageOMHSDKRSTB provides RSTB support for OhmageOMHSDK'
 
     siteUrl = 'https://researchsuite.org'
     gitUrl = 'https://github.com/cornelltech/OhmageOMHSDK-Android.git'
@@ -155,4 +166,3 @@ bintray {
         publish = true
     }
 }
-

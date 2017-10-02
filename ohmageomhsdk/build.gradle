@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-version = '0.0.4'
+version = '0.0.5'
 
 android {
     compileSdkVersion 24
@@ -27,8 +27,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.google.code.gson:gson:2.4'
-//    compile project(":omhclient")
-    compile 'edu.cornell.tech.foundry:omhclient:0.0.4'
+    compile project(":omhclient")
+//    compile 'edu.cornell.tech.foundry:omhclient:0.0.4'
     compile 'com.squareup:tape:1.2.3'
 }
 
