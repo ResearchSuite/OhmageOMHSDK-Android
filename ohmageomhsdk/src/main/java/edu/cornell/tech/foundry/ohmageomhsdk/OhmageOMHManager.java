@@ -38,6 +38,7 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
     private String accessToken;
     private String refreshToken;
     private Object credentialsLock;
+    private boolean credentialStoreUnlocked;
 
     private Context context;
 
@@ -101,13 +102,14 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
 
         this.credentialStore = store;
 
-        this.getAccessToken();
+        this.credentialStoreUnlocked = false;
+//        this.getAccessToken();
 //        String savedAccessToken = this.getAccessToken();
 //        if(savedAccessToken != null) {
 //            this.accessToken = savedAccessToken;
 //        }
 
-        this.getRefreshToken();
+//        this.getRefreshToken();
 //        String savedRefreshToken = this.getRefreshToken();
 //        if(savedRefreshToken != null) {
 //            this.refreshToken = savedRefreshToken;
@@ -128,13 +130,22 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
         this.ohmageOMHDatapointQueue.setListener(this);
 
         //try to upload any existing datapoints
-        this.upload();
+//        this.upload();
 
+    }
+
+    public void setCredentialStoreUnlocked(boolean credentialStoreUnlocked) {
+        if (credentialStoreUnlocked) {
+            this.getAccessToken();
+            this.getRefreshToken();
+            this.upload();
+        }
+        this.credentialStoreUnlocked = credentialStoreUnlocked;
     }
 
     public boolean isSignedIn() {
         synchronized (this.credentialsLock) {
-            return this.refreshToken != null && !this.refreshToken.isEmpty();
+            return this.credentialStore.has(context, REFRESH_TOKEN);
         }
     }
 
@@ -186,7 +197,7 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
     private void refreshThenAdd(final OMHDataPoint datapoint, final Completion completion) {
         String localRefreshToken;
         synchronized (credentialsLock) {
-            localRefreshToken = refreshToken;
+            localRefreshToken = this.getRefreshToken();
         }
 
         client.refreshAccessToken(localRefreshToken, new OMHClient.AuthCompletion() {
@@ -207,7 +218,7 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
     private void refresh(final Completion completion) {
         String localRefreshToken;
         synchronized (credentialsLock) {
-            localRefreshToken = refreshToken;
+            localRefreshToken = this.getRefreshToken();
         }
 
         client.refreshAccessToken(localRefreshToken, new OMHClient.AuthCompletion() {
@@ -228,6 +239,7 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
     private void tryToUpload() {
 
         assert(this.isSignedIn());
+        assert(this.credentialStoreUnlocked);
 
         synchronized (this.uploadLock) {
 
@@ -247,7 +259,7 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
 
             String localAccessToken;
             synchronized (this.credentialsLock) {
-                localAccessToken = this.accessToken;
+                localAccessToken = this.getAccessToken();
             }
 
             assert(localAccessToken != null && !localAccessToken.isEmpty());
@@ -309,6 +321,7 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
     private void upload() {
 
 
+        if (!this.credentialStoreUnlocked || !this.isSignedIn()) { return; }
 
         //start async task here
 
@@ -356,6 +369,8 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
             return;
         }
 
+        assert(this.credentialStoreUnlocked);
+
         this.client.signIn(username, password, new OMHClient.AuthCompletion() {
             @Override
             public void onCompletion(OMHClientSignInResponse response, Exception e) {
@@ -381,6 +396,8 @@ public class OhmageOMHManager implements ObjectQueue.Listener<String> {
             completion.onCompletion(new OhmageOMHAlreadySignedIn());
             return;
         }
+
+        assert(this.credentialStoreUnlocked);
 
         this.client.signIn(code, new OMHClient.AuthCompletion() {
             @Override
