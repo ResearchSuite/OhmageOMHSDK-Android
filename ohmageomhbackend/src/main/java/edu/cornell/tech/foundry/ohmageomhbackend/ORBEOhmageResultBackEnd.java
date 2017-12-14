@@ -2,11 +2,12 @@ package edu.cornell.tech.foundry.ohmageomhbackend;
 
 import android.content.Context;
 
+import org.researchsuite.rsrp.RSRPBackEnd;
+import org.researchsuite.rsrp.RSRPIntermediateResult;
+
 import edu.cornell.tech.foundry.ohmageomhbackend.ORBEIntermediateResultTransformer.ORBEIntermediateResultTransformerService;
 import edu.cornell.tech.foundry.ohmageomhsdk.OhmageOMHManager;
 import edu.cornell.tech.foundry.omhclient.OMHDataPoint;
-import edu.cornell.tech.foundry.researchsuiteresultprocessor.RSRPBackEnd;
-import edu.cornell.tech.foundry.researchsuiteresultprocessor.RSRPIntermediateResult;
 
 /**
  * Created by jameskizer on 2/4/17.
