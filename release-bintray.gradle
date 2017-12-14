@@ -25,7 +25,7 @@ ext {
   developerEmail = properties.getProperty("developer.email")
 
   licenseName = 'Apache-2.0'
-  licenseUrl = 'https://github.com/ResearchSuite/ResearchSuiteResultsProcessor-Android/LICENSE'
+  licenseUrl = 'https://github.com/ResearchSuite/OhmageOMHSDK-Android/LICENSE'
   allLicenses = ["Apache-2.0"]
 }
 
