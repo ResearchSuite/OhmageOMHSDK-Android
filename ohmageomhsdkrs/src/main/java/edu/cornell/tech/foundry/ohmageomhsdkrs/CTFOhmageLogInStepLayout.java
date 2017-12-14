@@ -37,7 +37,7 @@ public class CTFOhmageLogInStepLayout extends CTFLogInStepLayout {
     }
 
     @Override
-    protected void loginButtonAction(String identity, String password, ActionCompletion completion) {
+    protected void loginButtonAction(String identity, String password, final ActionCompletion completion) {
 
         final Activity activity = (Activity)this.context;
         OhmageOMHManager.getInstance().signIn(identity, password, new OhmageOMHManager.Completion() {
@@ -73,7 +73,7 @@ public class CTFOhmageLogInStepLayout extends CTFLogInStepLayout {
     }
 
     @Override
-    protected void forgotPasswordButtonAction(String identity, ActionCompletion completion) {
+    protected void forgotPasswordButtonAction(String identity, final ActionCompletion completion) {
 
         final Activity activity = (Activity)this.context;
 

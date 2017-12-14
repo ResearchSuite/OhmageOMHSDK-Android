@@ -225,7 +225,7 @@ public class CTFLogInStepLayout extends RelativeLayout implements StepLayout {
         this.callbacks = callbacks;
     }
 
-    protected void loginButtonAction(String identity, String password, ActionCompletion completion) {
+    protected void loginButtonAction(String identity, String password, final ActionCompletion completion) {
 
         final Activity activity = (Activity)this.context;
         activity.runOnUiThread(new Runnable() {
@@ -236,7 +236,7 @@ public class CTFLogInStepLayout extends RelativeLayout implements StepLayout {
 
     }
 
-    protected void forgotPasswordButtonAction(String identity, ActionCompletion completion) {
+    protected void forgotPasswordButtonAction(String identity, final ActionCompletion completion) {
 
         final Activity activity = (Activity)this.context;
         activity.runOnUiThread(new Runnable() {

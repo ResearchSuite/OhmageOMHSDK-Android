@@ -19,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -29,7 +34,8 @@ dependencies {
     implementation project(":ohmageomhsdk")
     implementation 'org.researchstack:backbone:1.1.2'
     implementation 'org.researchstack:skin:1.1.2'
-    implementation 'org.researchsuite:rsuiteextensionscore:0.0.1'
+    implementation 'org.researchsuite:rsuiteextensionscore:0.1.0'
+    implementation 'com.squareup:tape:1.2.3'
 }
 
 apply from: rootProject.file('release-bintray.gradle')

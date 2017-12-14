@@ -4,13 +4,13 @@ import com.google.gson.JsonObject;
 
 import org.researchstack.backbone.step.Step;
 import org.researchsuite.rsextensionsrstb.RSRedirectStepDescriptor;
+import org.researchsuite.rstb.DefaultStepGenerators.RSTBBaseStepGenerator;
+import org.researchsuite.rstb.RSTBTaskBuilderHelper;
 import org.researchsuite.rsuiteextensionscore.RSRedirectStep;
 
 import java.util.Arrays;
 
 import edu.cornell.tech.foundry.ohmageomhsdkrs.OhmageOMHRedirectAuthStepLayout;
-import edu.cornell.tech.foundry.researchsuitetaskbuilder.DefaultStepGenerators.RSTBBaseStepGenerator;
-import edu.cornell.tech.foundry.researchsuitetaskbuilder.RSTBTaskBuilderHelper;
 
 /**
  * Created by jameskizer on 9/1/17.
