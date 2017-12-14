@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "edu.cornell.tech.foundry.ohmageomhsdk"
+        applicationId "org.researchsuite.ohmageomhsdk"
         minSdkVersion 21
         targetSdkVersion 25
         versionCode 1

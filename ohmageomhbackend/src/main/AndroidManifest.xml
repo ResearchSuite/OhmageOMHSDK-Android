@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.cornell.tech.foundry.ohmageomhbackend">
+    package="org.researchsuite.ohmageomhbackend">
 
     <application
         android:allowBackup="true"
